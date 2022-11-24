@@ -15,7 +15,7 @@ class CBAA_agent():
     self.task_num = task.shape[0]
 
     # Local Task Assignment List
-    self.x = np.zeros(self.task_num, dtype=np.int8)
+    self.x = [0 for i in range(self.task_num)]
     # Local Winning Bid List
     self.y = np.array([ -np.inf for _ in range(self.task_num)])
 
@@ -44,7 +44,11 @@ class CBAA_agent():
     """
     [input]
     Y: winning bid lists from neighbors (dict:{neighbor_id:bid_list})
+    [output]
+    converged: True or False
     """
+
+    old_x = copy.deepcopy(self.x)
 
     id_list = list(Y.keys())
     id_list.insert(0, self.id)
@@ -71,6 +75,12 @@ class CBAA_agent():
         # Release the assignment
         self.x[self.J] = 0
 
+    converged = False
+    if old_x == self.x:
+      converged = True
+
+    return converged
+
   def send_message(self):
     """
     Return local winning bid list
@@ -81,8 +91,8 @@ class CBAA_agent():
 
 if __name__=="__main__":
 
-  task_num = 5
-  robot_num = 5
+  task_num = 4
+  robot_num = 4
 
   task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
@@ -95,6 +105,8 @@ if __name__=="__main__":
 
   t = 0 # Iteration number
   while True:
+    converged_list = []
+
     print("==Iteration {}==".format(t))
     ## Phase 1: Auction Process
     print("Auction Process")
@@ -123,10 +135,15 @@ if __name__=="__main__":
 
       # Update local information and decision
       if Y is not None:
-        robot.update_task(Y)
+        converged = robot.update_task(Y)
+        converged_list.append(converged)
 
       print(robot.x)
 
     t += 1
 
+    if sum(converged_list)==robot_num:
+      break
+
+  print("CONVERGED")
 
