@@ -91,15 +91,16 @@ class CBAA_agent():
 
 if __name__=="__main__":
 
-  task_num = 4
-  robot_num = 4
+  task_num = 5
+  robot_num = 5
 
   task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
   robot_list = [CBAA_agent(id=i, task=task) for i in range(robot_num)]
 
   # Network Initialize
-  G = np.ones((robot_num, robot_num)) # Fully connected network
+  G = np.ones((robot_num, robot_num)) # Fully connected network\
+  # Configure network topology manually
   # G[0,1]=0
   # G[1,0]=0
 

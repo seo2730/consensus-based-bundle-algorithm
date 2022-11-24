@@ -304,7 +304,7 @@ if __name__=="__main__":
 
   np.random.seed(2)
 
-  task_num = 3
+  task_num = 10
   robot_num = 3
 
   task = np.random.uniform(low=0,high=1,size=(task_num,2))
