@@ -16,7 +16,7 @@ robot_num = 4
 
 task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
-robot_list = [CBBA_agent(id=i, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
+robot_list = [CBBA_agent(id=i, vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
 
 # Network Initialize
 G = np.ones((robot_num, robot_num)) # Fully connected network

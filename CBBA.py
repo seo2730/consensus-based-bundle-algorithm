@@ -3,13 +3,14 @@ import copy
 
 
 class CBBA_agent():
-  def __init__(self, id = None, task_num = None, agent_num = None, L_t = None):
+  def __init__(self, id = None, vel=None, task_num = None, agent_num = None, L_t = None):
 
     self.task_num = task_num
     self.agent_num = agent_num
 
-    # Agent ID
+    # Agent information
     self.id = id
+    self.vel = vel
 
     # Local Winning Agent List
     self.z = np.ones(self.task_num, dtype=np.int8) * self.id
@@ -29,6 +30,15 @@ class CBBA_agent():
     # This part can be modified depend on the problem
     self.state = np.random.uniform(low=0, high=1, size=(1,2)) # Agent State (Position)
     self.c = np.zeros(self.task_num) # Initial Score (Euclidean Distance)
+
+    # socre function parameters
+    self.Lambda = 0.95
+    self.c_bar = np.ones(self.task_num)
+
+  def tau(self,j):
+    # Estimate time agent will take to arrive at task j's location
+    # This function can be used in later
+    pass
 
   def set_state(self, state):
     """
@@ -61,10 +71,10 @@ class CBBA_agent():
       if len(self.p) > 0:
         distance_j = 0
         distance_j += np.linalg.norm(self.state.squeeze()-task[self.p[0]])
-        S_p += np.exp(-distance_j)
+        S_p += (self.Lambda**(distance_j/self.vel)) * self.c_bar[self.p[0]]
         for p_idx in range(len(self.p)-1):
           distance_j += np.linalg.norm(task[self.p[p_idx]]-task[self.p[p_idx+1]])
-          S_p += np.exp(-distance_j)
+          S_p += (self.Lambda**(distance_j/self.vel)) * self.c_bar[self.p[p_idx+1]]
 
       # Calculate c_ij for each task j
       best_pos = {}
@@ -79,11 +89,11 @@ class CBBA_agent():
             c_temp = 0
             distance_j = 0
             distance_j += np.linalg.norm(self.state.squeeze()-task[p_temp[0]])
-            c_temp += np.exp(-distance_j)
+            c_temp += (self.Lambda**(distance_j/self.vel)) * self.c_bar[p_temp[0]]
             if len(p_temp) > 1:
               for p_loc in range(len(p_temp)-1):
                 distance_j += np.linalg.norm(task[p_temp[p_loc]]-task[p_temp[p_loc+1]])
-                c_temp += np.exp(-distance_j)
+                c_temp += (self.Lambda**(distance_j/self.vel)) * self.c_bar[p_temp[p_loc+1]]
 
             c_jn = c_temp-S_p
             c_list.append(c_jn)
@@ -302,7 +312,7 @@ class CBBA_agent():
 if __name__=="__main__":
   import matplotlib.pyplot as plt
 
-  np.random.seed(2)
+  np.random.seed(10)
 
   task_num = 10
   robot_num = 3
@@ -310,7 +320,7 @@ if __name__=="__main__":
   task = np.random.uniform(low=0,high=1,size=(task_num,2))
   # task = np.array([[0,1],[1,1],[1,2]])
 
-  robot_list = [CBBA_agent(id=i, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
+  robot_list = [CBBA_agent(id=i, vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
   # robot_list[0].state = np.array([[0,0]])
   # robot_list[1].state = np.array([[1,0]])
 
