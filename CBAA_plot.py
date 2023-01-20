@@ -29,6 +29,7 @@ t = 0 # Iteration number
 assign_plots = []
 
 while True:
+  converged_list = []
   print("==Iteration {}==".format(t))
   ## Phase 1: Auction Process
   print("Auction Process")
@@ -54,17 +55,34 @@ while True:
     # Recieve winning bidlist from neighbors
     g = G[robot_id]
     connected, = np.where(g==1)
-    Y = {neighbor_id:message_pool[neighbor_id] for neighbor_id in connected}
+    connected = list(connected)
+    connected.remove(robot_id)
+
+    if len(connected) > 0:
+        Y = {neighbor_id:message_pool[neighbor_id] for neighbor_id in connected}
+    else:
+        Y = None
 
     # Update local information and decision
-    robot.update_task(Y)
+    if Y is not None:
+      converged = robot.update_task(Y)
+      converged_list.append(converged)
+
     # print(robot.x)
 
-    if (robot.x).any():
+    if any(robot.x): # (list)
       assign_plots[robot_id].set_data([robot.state[0][0],task[robot.J,0]],[robot.state[0][1],task[robot.J,1]])
     else:
       assign_plots[robot_id].set_data([robot.state[0][0],robot.state[0][0]],[robot.state[0][1],robot.state[0][1]])
 
+
+
   plt.pause(0.5)
 
   t += 1
+
+  # 모든 로봇 agent 수와 최적의 임무계획 결과 수가 같으면 모든게 합의됨.
+  if sum(converged_list)==robot_num:
+    break
+
+print("CONVERGED")
