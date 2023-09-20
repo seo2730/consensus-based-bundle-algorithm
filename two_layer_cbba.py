@@ -1,6 +1,8 @@
 from CBBA import CBBA_agent
 
+import pandas as pd
 import numpy as np
+from sklearn.cluster import KMeans
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -9,31 +11,55 @@ from matplotlib.lines import Line2D
 import imageio
 import os
 
+# def group(robot_num):
+  
+
+#   return 
+
 np.random.seed(3)
 
 task_num = 20
 robot_num = 4
 
 task = np.random.uniform(low=0,high=1,size=(task_num,2))
+print(task)
+# Clustering
+cluster = KMeans(n_clusters=robot_num)
+cluster.fit(task)
+cluster_task = cluster.fit_predict(task)
+print(cluster_task)
+cluster_center_point = cluster.cluster_centers_
+cluster_group_task = []
+temp_groupt_task = cluster_task.tolist()
+for i in range(len(cluster_center_point)):
+    # print(np.where(cluster_task==i))
+    cluster_group_task.append([t for t,value in enumerate(temp_groupt_task) if value==i])
 
-robot_list = [CBBA_agent(id=i, vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
+group1_task = task[np.array(cluster_group_task[0])]
 
+# plt.figure(figsize = (8, 8))
+# for i in range(robot_num):
+#     plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
+# plt.show()
+
+print(cluster_group_task)
+print(task.shape)
+robot_list = [CBBA_agent(id=i, vel=1, task_num=len(cluster_group_task[0]), agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
 # Network Initialize
 G = np.ones((robot_num, robot_num)) # Fully connected network
 # disconnect link arbitrary
-
-# G[2,3]=0
-# G[3,2]=0
-# G[1,2]=0
-# G[2,1]=0
-# G[1,3]=0
-# G[3,1]=0
+G[2,3]=0
+G[3,2]=0
+G[1,2]=0
+G[2,1]=0
+G[1,3]=0
+G[3,1]=0
 
 fig, ax = plt.subplots()
 ax.set_xlim((-0.1,1.1))
 ax.set_ylim((-0.1,1.1))
 
-ax.plot(task[:,0],task[:,1],'rx',label="Task")
+ax.plot(task[group1_task,0],task[group1_task,1],'rx',label="group1_task")
 robot_pos = np.array([r.state[0].tolist() for r in robot_list])
 ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Robot")
 
@@ -58,7 +84,7 @@ filenames = []
 if save_gif:
   if not os.path.exists("my_gif"):
     os.makedirs("my_gif")
-
+print(task[group1_task])
 while True:
   converged_list = []
 
@@ -67,7 +93,7 @@ while True:
   print("Auction Process")
   for robot_id, robot in enumerate(robot_list):
     # select task by local information
-    robot.build_bundle(task)
+    robot.build_bundle(task[group1_task])
 
     ## Plot
     if len(robot.p) > 0:
