@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-task_num = 10
-robot_num = 10
+task_num = 4
+robot_num = 4
 
 task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
@@ -21,6 +21,12 @@ ax.plot(robot_pos[:,0],robot_pos[:,1],'b^')
 
 # Network Initialize
 G = np.ones((robot_num, robot_num)) # Fully connected network
+G[2,3]=0
+G[3,2]=0
+G[1,2]=0
+G[2,1]=0
+G[1,3]=0
+G[3,1]=0
 # for i in range(robot_num-1):
 #   for j in range(i+1,robot_num):
 #     ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
@@ -67,7 +73,7 @@ while True:
     if Y is not None:
       converged = robot.update_task(Y)
       converged_list.append(converged)
-
+      print(converged)
     # print(robot.x)
 
     if any(robot.x): # (list)
@@ -82,7 +88,8 @@ while True:
   t += 1
 
   # 모든 로봇 agent 수와 최적의 임무계획 결과 수가 같으면 모든게 합의됨.
-  if sum(converged_list)==robot_num:
-    break
+  # if sum(converged_list)==robot_num:
+  #   break
 
 print("CONVERGED")
+plt.show()
