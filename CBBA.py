@@ -3,7 +3,7 @@ import copy
 
 
 class CBBA_agent():
-  def __init__(self, id = None, vel=None, task_num = None, agent_num = None, L_t = None):
+  def __init__(self, id = None, state=None, vel=None, task_num = None, agent_num = None, L_t = None):
 
     self.task_num = task_num
     self.agent_num = agent_num
@@ -28,7 +28,7 @@ class CBBA_agent():
     self.s = {a:self.time_step for a in range(self.agent_num)}
 
     # This part can be modified depend on the problem
-    self.state = np.random.uniform(low=0, high=1, size=(1,2)) # Agent State (Position)
+    self.state = state # np.random.uniform(low=0, high=1, size=(1,2)) # Agent State (Position)
     self.c = np.zeros(self.task_num) # Initial Score (Euclidean Distance)
 
     # socre function parameters

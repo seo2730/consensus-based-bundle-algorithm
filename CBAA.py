@@ -4,7 +4,7 @@ from scipy.spatial import distance_matrix
 
 
 class CBAA_agent():
-  def __init__(self, id=0, task=None):
+  def __init__(self, id=0, state=None, task=None):
     """
     c: individual score list
     x: local assignment list
@@ -21,7 +21,7 @@ class CBAA_agent():
 
 
     # This part can be modified depend on the problem
-    self.state = np.random.uniform(low=0, high=1, size=(1,2)) # Agent State (Position)
+    self.state = state # np.random.uniform(low=0, high=1, size=(1,2)) # Agent State (Position)
     self.c = -distance_matrix(self.state,task).squeeze() # Score (Euclidean Distance)
 
     # Agent ID

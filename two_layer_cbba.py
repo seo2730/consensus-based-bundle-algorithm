@@ -14,12 +14,22 @@ import os
 
 np.random.seed(3)
 
-task_num = 20
+task_num = 40
 group_num=4
 for i in range(group_num):
   globals()['group{}_num'.format(i)]=5
 
-task = np.random.uniform(low=0,high=1,size=(task_num,2))
+task = np.random.uniform(low=0,high=30,size=(task_num,2))
+
+robots = []
+for i in range(group_num):
+  robots.append([])
+  for j in range(globals()['group{}_num'.format(i)]):
+    robots[i].append(np.random.uniform(low=i*5, high=i*5+5, size=(1,2)))
+
+print(robots)
+# robots = np.array(robots)
+# print(robots)
 
 ####################
 #### Clustering ####
@@ -38,7 +48,7 @@ for i in range(len(cluster_center_point)):
 #### Leader CBAA ####
 #####################
 # leader_list = [CBBA_agent(id=i, vel=1, task_num=len(cluster_center_point), agent_num=group_num, L_t=cluster_center_point.shape[0]) for i in range(group_num)]
-leader_list = [CBAA_agent(id=i, task=cluster_center_point) for i in range(group_num)]
+leader_list = [CBAA_agent(id=i, state=robots[i][0],task=cluster_center_point) for i in range(group_num)]
 # Network Initialize
 G_leader = np.ones((group_num, group_num)) # Fully connected network
 # disconnect link arbitrary
@@ -50,8 +60,8 @@ G_leader = np.ones((group_num, group_num)) # Fully connected network
 # G_leader[3,1]=0
 
 fig, ax = plt.subplots()
-ax.set_xlim((-0.1,1.1))
-ax.set_ylim((-0.1,1.1))
+ax.set_xlim((-0.1,30.1))
+ax.set_ylim((-0.1,30.1))
 
 ax.plot(cluster_center_point[:,0],cluster_center_point[:,1],'rx',label="leader_task")
 robot_pos = np.array([r.state[0].tolist() for r in leader_list])
@@ -137,9 +147,9 @@ G0 = np.ones((group0_num, group0_num)) # Fully connected network
 
 # Group allocated task
 for i in range(group_num):
-  globals()['group{}_task'.format(i)]=task[np.array(cluster_group_task[i])]
-  group_task = np.array(cluster_group_task[i])
-  globals()['group{}_robot'.format(i)]=[CBBA_agent(id=k, vel=1, task_num=len(globals()['group{}_task'.format(i)]), agent_num=globals()['group{}_num'.format(i)], L_t=group_task.shape[0]) for k in range(globals()['group{}_num'.format(i)])]
+  globals()['group{}_task'.format(i)]=task[np.array(cluster_group_task[leader_list[i].J])]
+  group_task = np.array(cluster_group_task[leader_list[i].J])
+  globals()['group{}_robot'.format(i)]=[CBBA_agent(id=k, state=robots[i][k], vel=1, task_num=len(globals()['group{}_task'.format(i)]), agent_num=globals()['group{}_num'.format(i)], L_t=group_task.shape[0]) for k in range(globals()['group{}_num'.format(i)])]
 
 t = 0 # Iteration number
 assign_plots = []
