@@ -11,8 +11,8 @@ import os
 
 np.random.seed(3)
 
-task_num = 1
-robot_num = 4
+task_num = 40
+robot_num = 20
 
 task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
