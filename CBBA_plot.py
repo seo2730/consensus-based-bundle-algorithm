@@ -11,8 +11,8 @@ import os
 
 np.random.seed(3)
 
-task_num = 20
-robot_num = 20
+task_num = 1
+robot_num = 4
 
 task = np.random.uniform(low=0,high=1,size=(task_num,2))
 
@@ -22,12 +22,12 @@ robot_list = [CBBA_agent(id=i, vel=1, task_num=task_num, agent_num=robot_num, L_
 G = np.ones((robot_num, robot_num)) # Fully connected network
 # disconnect link arbitrary
 
-# G[2,3]=0
-# G[3,2]=0
-# G[1,2]=0
-# G[2,1]=0
-# G[1,3]=0
-# G[3,1]=0
+G[2,3]=0
+G[3,2]=0
+G[1,2]=0
+G[2,1]=0
+G[1,3]=0
+G[3,1]=0
 
 fig, ax = plt.subplots()
 ax.set_xlim((-0.1,1.1))
