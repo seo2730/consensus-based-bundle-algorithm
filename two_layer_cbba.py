@@ -86,6 +86,7 @@ ax.legend(handles=handles)
 t = 0 # Iteration number
 assign_plots = []
 
+start = time.time()
 while True:
   converged_list = []
   print("==Iteration {}==".format(t))
@@ -299,7 +300,9 @@ for r in range(group_num):
     if t>max_t:
       ax.set_title("Time Step:{}, Max time step overed".format(t))
       break
+end = time.time()
 
+print(f"{end-start:.5f} sec")
 
 if save_gif:
     filename = f'./my_gif/{t}_F.png'
