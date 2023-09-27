@@ -9,10 +9,12 @@ from matplotlib.lines import Line2D
 import imageio
 import os
 
+import time
+
 np.random.seed(3)
 
 task_num = 40
-robot_num = 20
+robot_num = 10
 
 task = np.random.uniform(low=0,high=30,size=(task_num,2))
 
@@ -20,7 +22,7 @@ robots=[]
 for i in range(robot_num):
   robots.append(np.random.uniform(low=0, high=30, size=(1,2)))
 
-robot_list = [CBBA_agent(id=i, state=robot[i],vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
+robot_list = [CBBA_agent(id=i, state=robots[i],vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
 
 # Network Initialize
 G = np.ones((robot_num, robot_num)) # Fully connected network
@@ -34,8 +36,8 @@ G[1,3]=0
 G[3,1]=0
 
 fig, ax = plt.subplots()
-ax.set_xlim((-0.1,1.1))
-ax.set_ylim((-0.1,1.1))
+ax.set_xlim((-0.1,30.1))
+ax.set_ylim((-0.1,30.1))
 
 ax.plot(task[:,0],task[:,1],'rx',label="Task")
 robot_pos = np.array([r.state[0].tolist() for r in robot_list])
@@ -63,6 +65,7 @@ if save_gif:
   if not os.path.exists("my_gif"):
     os.makedirs("my_gif")
 
+start = time.time()
 while True:
   converged_list = []
 
@@ -162,6 +165,9 @@ while True:
   if t>max_t:
     ax.set_title("Time Step:{}, Max time step overed".format(t))
     break
+end = time.time()
+
+print(f"{end-start:.5f} sec")
 
 
 if save_gif:

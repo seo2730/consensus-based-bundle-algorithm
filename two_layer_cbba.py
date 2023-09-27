@@ -17,7 +17,7 @@ import time
 # np.random.seed(3)
 
 task_num = 40
-group_num=4
+group_num=2
 for i in range(group_num):
   globals()['group{}_num'.format(i)]=5
 
