@@ -12,7 +12,9 @@ from matplotlib.lines import Line2D
 import imageio
 import os
 
-np.random.seed(3)
+import time
+
+# np.random.seed(3)
 
 task_num = 40
 group_num=4
@@ -194,8 +196,10 @@ if save_gif:
   if not os.path.exists("my_gif"):
     os.makedirs("my_gif")
 
-while True:
-  for r in range(group_num):
+for r in range(group_num):
+  t=0
+  assign_plots.append([])
+  while True:  
     converged_list = []
 
     print("==Iteration {}==".format(t))
@@ -215,9 +219,9 @@ while True:
         y_data=[robot.state[0][1]]
       if t == 0:
         assign_line, = ax.plot(x_data,y_data,'k-',linewidth=1)
-        assign_plots.append(assign_line)
+        assign_plots[r].append(assign_line)
       else:
-        assign_plots[robot_id].set_data(x_data,y_data)
+        assign_plots[r][robot_id].set_data(x_data,y_data)
 
     print("Bundle")
     for robot in globals()['group{}_robot'.format(r)]:
@@ -270,7 +274,7 @@ while True:
         x_data=[robot.state[0][0]]
         y_data=[robot.state[0][1]]
 
-      assign_plots[robot_id].set_data(x_data,y_data)
+      assign_plots[r][robot_id].set_data(x_data,y_data)
 
     ## Plot
     ax.set_title("Time Step:{}, Consensus".format(t))
