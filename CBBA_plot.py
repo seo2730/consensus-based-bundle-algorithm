@@ -1,6 +1,9 @@
 from CBBA import CBBA_agent
+from CBAA import CBAA_agent
 
+import pandas as pd
 import numpy as np
+from sklearn.cluster import KMeans
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -11,18 +14,29 @@ import os
 
 import time
 
-np.random.seed(3)
 
-task_num = 40
-robot_num = 10
+
+task_num = 20
+group_num=4
+for i in range(group_num):
+  globals()['group{}_num'.format(i)]=5
+
+robot_num = group_num * group0_num
 
 task = np.random.uniform(low=0,high=30,size=(task_num,2))
 
-robots=[]
-for i in range(robot_num):
-  robots.append(np.random.uniform(low=0, high=30, size=(1,2)))
+robots = []
+for i in range(group_num):
+  robots.append([])
+  for j in range(globals()['group{}_num'.format(i)]):
+    robots[i].append(np.random.uniform(low=i*5, high=i*5+5, size=(1,2)))
 
-robot_list = [CBBA_agent(id=i, state=robots[i],vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
+########################
+#### One-layer CBBA ####
+########################
+
+robots_1D = sum(robots,[])
+robot_list = [CBBA_agent(id=i, state=robots_1D[i],vel=1, task_num=task_num, agent_num=robot_num, L_t=task.shape[0]) for i in range(robot_num)]
 
 # Network Initialize
 G = np.ones((robot_num, robot_num)) # Fully connected network
@@ -58,12 +72,12 @@ assign_plots = []
 max_t = 100
 plot_gap = 0.1
 
-save_gif = False
+save_gif = True
 filenames = []
 
 if save_gif:
-  if not os.path.exists("my_gif"):
-    os.makedirs("my_gif")
+  if not os.path.exists("one_layer_cbba_gif"):
+    os.makedirs("one_layer_cbba_gif")
 
 start = time.time()
 while True:
@@ -146,7 +160,7 @@ while True:
   ax.set_title("Time Step:{}, Consensus".format(t))
   plt.pause(plot_gap)
   if save_gif:
-    filename = f'./my_gif/{t}_C.png'
+    filename = f'./one_layer_cbba_gif/{t}_C.png'
     filenames.append(filename)
     plt.savefig(filename)
 
@@ -171,7 +185,7 @@ print(f"{end-start:.5f} sec")
 
 
 if save_gif:
-    filename = f'./my_gif/{t}_F.png'
+    filename = f'./one_layer_cbba_gif/{t}_F.png'
     filenames.append(filename)
     plt.savefig(filename)
 
@@ -180,8 +194,8 @@ if save_gif:
     for filename in filenames:
         image = imageio.imread(filename)
         files.append(image)
-    imageio.mimsave("./my_gif/mygif.gif", files, format='GIF', fps = 0.5)
-    with imageio.get_writer('./my_gif/mygif.gif', mode='I') as writer:
+    imageio.mimsave("./one_layer_cbba_gif/mygif.gif", files, format='GIF', duration = 0.5)
+    with imageio.get_writer('./one_layer_cbba_gif/mygif.gif', mode='I') as writer:
         for filename in filenames:
             image = imageio.imread(filename)
             writer.append_data(image)
