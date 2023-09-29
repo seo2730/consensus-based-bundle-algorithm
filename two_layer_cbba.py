@@ -64,17 +64,20 @@ graph_network=[[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
 G = np.array(graph_network)
 
 fig, ax = plt.subplots()
-ax.set_xlim((-0.1,30.1))
-ax.set_ylim((-0.1,30.1))
+ax.set_xlim((-0.1,40.1))
+ax.set_ylim((-0.1,40.1))
 
-ax.plot(task[:,0],task[:,1],'rx',label="Task")
+ax.plot(task[:,0],task[:,1],color='#8c564b',marker='o',linestyle='',label="Task")
 robot_pos = np.array([r.state[0].tolist() for r in robot_list])
-ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Robot")
+ax.plot(robot_pos[:,0],robot_pos[:,1],'m^',label="Robot")
 
 for i in range(robot_num-1):
   for j in range(i+1,robot_num):
     if G[i][j] == 1:
-      ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+      if (i==0 or i==5 or i==10 or i==15) and (j==0 or j==5 or j==10 or j==15):
+        ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+      else:
+        ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'k--',linewidth=1)  
 
 handles, labels = ax.get_legend_handles_labels()
 custom_line = Line2D([0], [0], color="g",linestyle="--",label="communication")
@@ -255,8 +258,8 @@ G_leader = np.ones((group_num, group_num)) # Fully connected network
 
 #### Plot ####
 fig, ax = plt.subplots()
-ax.set_xlim((-0.1,30.1))
-ax.set_ylim((-0.1,30.1))
+ax.set_xlim((-0.1,40.1))
+ax.set_ylim((-0.1,40.1))
 
 ax.plot(cluster_center_point[:,0],cluster_center_point[:,1],'rx',label="leader_task")
 for i in range(group_num):
@@ -353,18 +356,18 @@ for i in range(group_num):
 #### Plot ####
 # plt.show()
 plt.cla()
-for i in range(group_num):
-  plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
-robot_pos = np.array([r.state[0].tolist() for r in leader_list])
-ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
+# ax.set_xlim((-0.1,40.1))
+# ax.set_ylim((-0.1,40.1))
 
-for i in range(group_num):
-  group_pos = np.array
+# for i in range(group_num):
+#   plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
+# robot_pos = np.array([r.state[0].tolist() for r in leader_list])
+# ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
 
-for i in range(group_num-1):
-  for j in range(i+1,group_num):
-    if G_leader[i][j] == 1:
-      ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+# for i in range(group_num-1):
+#   for j in range(i+1,group_num):
+#     if G_leader[i][j] == 1:
+#       ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
 
 for i in range(group_num):
   globals()['group{}_pose'.format(i)]=np.array([r.state[0].tolist() for r in globals()['group{}_robot'.format(i)]])
@@ -378,6 +381,7 @@ for k in range(group_num):
 ##############
 
 t = 0 # Iteration number
+step=0
 assign_plots = []
 max_t = 100
 plot_gap = 0.1
@@ -395,7 +399,7 @@ for r in range(group_num):
   while True:  
     converged_list = []
 
-    print("==Iteration {}==".format(t))
+    print("==Iteration {}==".format(step))
     ## Phase 1: Auction Process
     print("Auction Process")
     for robot_id, robot in enumerate(globals()['group{}_robot'.format(r)]):
@@ -424,10 +428,10 @@ for r in range(group_num):
       print(robot.p)
 
     ## Plot
-    ax.set_title("Time Step:{}, Bundle Construct".format((t+1)*(r+1)))
+    ax.set_title("Time Step:{}, Bundle Construct".format(step))
     plt.pause(plot_gap)
     if save_gif:
-      filename = f'{t*(r+1)}_B.png'
+      filename = f'{step}_B.png'
       filenames.append(filename)
       plt.savefig(filename)
 
@@ -470,10 +474,10 @@ for r in range(group_num):
       assign_plots[r][robot_id].set_data(x_data,y_data)
 
     ## Plot
-    ax.set_title("Time Step:{}, Consensus".format(t))
+    ax.set_title("Time Step:{}, Consensus".format(step))
     plt.pause(plot_gap)
     if save_gif:
-      filename = f'./two_layer_cbba_gif/{t*(r+1)}_C.png'
+      filename = f'./two_layer_cbba_gif/{step}_C.png'
       filenames.append(filename)
       plt.savefig(filename)
 
@@ -485,19 +489,20 @@ for r in range(group_num):
       print(robot.p)
 
     t += 1
+    step+=1
 
     if sum(converged_list) == group0_num:
-      ax.set_title("Time Step:{}, Converged!".format(t))
+      ax.set_title("Time Step:{}, Converged!".format(step))
       break
     if t>max_t:
-      ax.set_title("Time Step:{}, Max time step overed".format(t))
+      ax.set_title("Time Step:{}, Max time step overed".format(step))
       break
 end = time.time()
 
 print(f"{end-start:.5f} sec")
 
 if save_gif:
-    filename = f'./two_layer_cbba_gif/{t*(r+1)}_F.png'
+    filename = f'./two_layer_cbba_gif/{step}_F.png'
     filenames.append(filename)
     plt.savefig(filename)
 
