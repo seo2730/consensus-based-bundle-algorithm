@@ -14,7 +14,9 @@ import os
 
 import time
 
-task_num = 20
+np.random.seed(3)
+
+task_num = 30
 group_num=4
 for i in range(group_num):
   globals()['group{}_num'.format(i)]=5
@@ -74,10 +76,10 @@ ax.plot(robot_pos[:,0],robot_pos[:,1],'m^',label="Robot")
 for i in range(robot_num-1):
   for j in range(i+1,robot_num):
     if G[i][j] == 1:
-      if (i==0 or i==5 or i==10 or i==15) and (j==0 or j==5 or j==10 or j==15):
-        ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
-      else:
-        ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'k--',linewidth=1)  
+      #if (i==0 or i==5 or i==10 or i==15) and (j==0 or j==5 or j==10 or j==15):
+      ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+      #else:
+      #  ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'k--',linewidth=1)  
 
 handles, labels = ax.get_legend_handles_labels()
 custom_line = Line2D([0], [0], color="g",linestyle="--",label="communication")
@@ -261,22 +263,22 @@ fig, ax = plt.subplots()
 ax.set_xlim((-0.1,40.1))
 ax.set_ylim((-0.1,40.1))
 
-ax.plot(cluster_center_point[:,0],cluster_center_point[:,1],'rx',label="leader_task")
-for i in range(group_num):
-  plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
-robot_pos = np.array([r.state[0].tolist() for r in leader_list])
-ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
+# ax.plot(cluster_center_point[:,0],cluster_center_point[:,1],'rx',label="leader_task")
+# for i in range(group_num):
+#   plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
+# robot_pos = np.array([r.state[0].tolist() for r in leader_list])
+# ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
 ##############
 
-for i in range(group_num-1):
-  for j in range(i+1,group_num):
-    if G_leader[i][j] == 1:
-      ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+# for i in range(group_num-1):
+#   for j in range(i+1,group_num):
+#     if G_leader[i][j] == 1:
+#       ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
 
-handles, labels = ax.get_legend_handles_labels()
-custom_line = Line2D([0], [0], color="g",linestyle="--",label="communication")
-handles.append(custom_line)
-ax.legend(handles=handles)
+# handles, labels = ax.get_legend_handles_labels()
+# custom_line = Line2D([0], [0], color="g",linestyle="--",label="communication")
+# handles.append(custom_line)
+# ax.legend(handles=handles)
 
 t = 0 # Iteration number
 assign_plots = []
@@ -291,13 +293,13 @@ while True:
     # select task by local information
     leader.select_task()
 
-    if t == 0:
-      assign_line, = ax.plot([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]],'k-',linewidth=1)
-      assign_plots.append(assign_line)
-    else:
-      assign_plots[leader_id].set_data([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]])
+    # if t == 0:
+    #   assign_line, = ax.plot([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]],'k-',linewidth=1)
+    #   assign_plots.append(assign_line)
+    # else:
+    #   assign_plots[leader_id].set_data([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]])
 
-  plt.pause(0.5)
+  # plt.pause(0.5)
 
   ## Phase 2: Consensus Process
   print("Consensus Process")
@@ -324,12 +326,12 @@ while True:
 
     # print(robot.x)
 
-    if any(leader.x): # (list)
-      assign_plots[leader_id].set_data([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]])
-    else:
-      assign_plots[leader_id].set_data([leader.state[0][0],leader.state[0][0]],[leader.state[0][1],leader.state[0][1]])
+    # if any(leader.x): # (list)
+    #   assign_plots[leader_id].set_data([leader.state[0][0],cluster_center_point[leader.J,0]],[leader.state[0][1],cluster_center_point[leader.J,1]])
+    # else:
+    #   assign_plots[leader_id].set_data([leader.state[0][0],leader.state[0][0]],[leader.state[0][1],leader.state[0][1]])
 
-  plt.pause(0.5)
+  # plt.pause(0.5)
 
   t += 1
 
@@ -355,23 +357,25 @@ for i in range(group_num):
 
 #### Plot ####
 # plt.show()
-plt.cla()
+# plt.cla()
 # ax.set_xlim((-0.1,40.1))
 # ax.set_ylim((-0.1,40.1))
 
-# for i in range(group_num):
-#   plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
-# robot_pos = np.array([r.state[0].tolist() for r in leader_list])
-# ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
-
-# for i in range(group_num-1):
-#   for j in range(i+1,group_num):
-#     if G_leader[i][j] == 1:
-#       ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+for i in range(group_num):
+  plt.scatter(task[np.where(cluster_task==i),0],task[np.where(cluster_task==i),1])
+robot_pos = np.array([r.state[0].tolist() for r in leader_list])
+ax.plot(robot_pos[:,0],robot_pos[:,1],'b^',label="Leader Robot")
 
 for i in range(group_num):
   globals()['group{}_pose'.format(i)]=np.array([r.state[0].tolist() for r in globals()['group{}_robot'.format(i)]])
   ax.plot(globals()['group{}_pose'.format(i)][1:,0], globals()['group{}_pose'.format(i)][1:,1],'m^',label="follower Robot")
+
+for i in range(group_num-1):
+  for j in range(i+1,group_num):
+    if G_leader[i][j] == 1:
+      ax.plot([robot_pos[i][0],robot_pos[j][0]],[robot_pos[i][1],robot_pos[j][1]],'g--',linewidth=1)
+
+
 
 for k in range(group_num):
   for i in range(globals()['group{}_num'.format(k)]-1):
@@ -520,4 +524,5 @@ if save_gif:
     for filename in set(filenames):
         os.remove(filename)
 
+plt.legend(['Group Task1','Group Task2','Group Task3','Group Task4', 'Leader robot','Follower robot'])
 plt.show()
